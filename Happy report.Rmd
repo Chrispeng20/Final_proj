@@ -1,0 +1,287 @@
+---
+title: "Happy"
+author: "Yuheng Peng"
+date: "12/18/2019"
+output: html_document
+---
+
+### Background Information
+The studies examine the state of happiness in today’s world to demonstrate how personal and national differences in happiness are understood by the new science of happiness.
+
+
+
+### Research Question
+
+1.where is the most happinest countries?
+2. what factors impact the happiness score.
+3.Which country have greatest improve in ranking and which attribute impove the  most?
+
+
+
+
+```{r}
+rm(list = ls())
+library(DataComputing)
+library(tidyverse)
+library(devtools)
+library(mosaic)
+```
+
+### Data Importing
+```{r}
+x2018<-read.csv("D:/HW/Stat184/2018.csv")
+x2019<-read.csv("D:/HW/Stat184/2019.csv")
+```
+
+### Data components
+
+```{r}
+head(x2018);
+```
+
+```{r}
+head(x2019)
+```
+
+
+
+### Q1
+From table 2019,the top 15 most happy countries, 10 countries from Europe, 2 countries from oceania, 1 country from Asia,1 country from North America and 1 country from Central America. From Scecond table 2018, the top 15 most happy countries, 11 countries from Europe, 2 countries from oceania,1 country from North America and 1 country from Central America.
+
+```{r}
+x2018%>%
+  select(Country.or.region,Score)%>%
+  arrange(desc(Score))%>%
+  head(15)
+```
+
+
+
+
+```{r}
+x2019%>%
+  select(Country.or.region,Score)%>%
+  arrange(desc(Score))%>%
+  head(15)
+```
+
+
+From the world map we can see that North America have high happiniess score and Africa have low happniess score. 
+
+```{r}
+x2019%>%
+WorldMap(key="Country.or.region", fill=Score)
+```
+
+## Q2
+
+### Generosity 
+
+```{r}
+ggplot(data=x2018,aes(x=Overall.rank,y=Generosity))+
+  geom_point()+
+  aes(colour=Generosity) + 
+  geom_smooth(method=loess)
+```
+
+
+```{r}
+ggplot(data=x2019,aes(x=Overall.rank,y=Generosity))+
+  geom_point()+
+  aes(colour=Generosity) + 
+  geom_smooth(method=loess) 
+```
+
+
+
+
+
+
+
+
+### GDP per Capital
+
+```{r}
+ggplot(data=x2018,aes(x=Overall.rank,y=GDP.per.capita))+
+  geom_point()+
+  aes(colour=GDP.per.capita)+
+  aes(size=GDP.per.capita)+ 
+  geom_smooth(method=lm) 
+```
+
+
+
+
+
+```{r}
+ggplot(data=x2019,aes(x=Overall.rank,y=GDP.per.capita))+
+  geom_point()+
+  aes(colour=GDP.per.capita)+
+  aes(size=GDP.per.capita)+ 
+  geom_smooth(method=lm) 
+```
+
+
+
+### social support
+```{r}
+ggplot(data=x2018,aes(x=Overall.rank,y=Social.support))+
+  geom_point() + 
+  geom_smooth(method=lm) 
+```
+
+
+
+
+```{r}
+ggplot(data=x2019,aes(x=Overall.rank,y=Social.support))+
+  geom_point() + 
+  geom_smooth(method=lm)
+```
+
+
+
+
+
+
+## Q3
+
+According to the table, Benin improve the most  over past year. Benin improve 34 levels.
+```{r}
+x2019%>%
+  mutate(rank19=Overall.rank,Country=Country.or.region)%>%
+  select(Country,rank19)%>%
+  left_join(x2018%>%
+          select(Country.or.region,Overall.rank),by=c("Country"="Country.or.region"))%>%
+  mutate(improveRank=Overall.rank-rank19)%>%
+  arrange(desc(improveRank))
+
+```
+
+
+
+
+```{r}
+#mutate data
+HP2019<- x2018%>%
+  mutate(Country=Country.or.region,GDP1=GDP.per.capita,SS1=Social.support,HL1=Healthy.life.expectancy,FREE1=Freedom.to.make.life.choices,GE1=Generosity,POF1=Perceptions.of.corruption)%>%
+  filter(Country=="Benin")%>%
+  select(Country,GDP1,SS1,HL1,FREE1,GE1,POF1)
+
+HP2018<- x2019%>%
+  mutate(Country=Country.or.region,GDP2=GDP.per.capita,SS2=Social.support,HL2=Healthy.life.expectancy,FREE2=Freedom.to.make.life.choices,GE2=Generosity,POF2=Perceptions.of.corruption)%>%
+    filter(Country.or.region=="Benin")%>%
+  select(Country,GDP2,SS2,HL2,FREE2,GE2,POF2)
+```
+
+
+
+### What is changed in Benin
+
+According to the calculation, Benin’s 5 attributes GDP per capita, social support, Healthy life expectancy, Generosity and corruption increase easpecially the Healthy life expectancy， it grows 65% in 2018 and that makes Benin’s happiniess score higher and improve it’s rank from 136 to 102
+
+
+```{r}
+HP2019
+```
+
+
+
+```{r}
+HP2018
+```
+
+
+```{r}
+#define function
+calculate=function(x,y){
+  improve=(x-y)/y
+  improve=improve*100
+  return(improve)
+}
+
+```
+
+
+```{r}
+#calculate GDP
+calculate(0.393,0.378)
+```
+
+
+
+```{r}
+#calculate Health
+calculate(0.397,0.24)
+```
+
+
+
+```{r}
+#calculate Generosity
+calculate(0.175,0.163)
+```
+
+
+```{r}
+#calculate corruption
+calculate（0.082，0.067)
+```
+
+
+```{r}
+#calculate Free choice
+calculate(0.349,0.44)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
